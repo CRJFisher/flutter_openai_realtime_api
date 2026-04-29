@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.3.0
+The 0.1.x and 0.2.x history was internal/private; 0.3.0 is the first public release on pub.dev.
+
+## [Unreleased]
+
+## [0.3.0] - 2026-04-29
 
 Targets the OpenAI Realtime GA API. Breaks every name from 0.2.x.
 

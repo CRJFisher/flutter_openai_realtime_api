@@ -12,7 +12,7 @@ This example app demonstrates the OpenAI Realtime API's capabilities, allowing y
 
 - **Real-time WebRTC Audio**: Experience ultra-low latency voice communication
 - **Natural Turn-Taking**: Automatic speech detection for smooth back-and-forth conversation
-- **Visual Feedback**: See when you're speaking and when Zyx is responding
+- **Visual Feedback**: See when you're speaking and when the assistant is responding
 
 ### AI Assistant
 

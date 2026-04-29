@@ -6,8 +6,8 @@ repository: https://github.com/crjfisher/flutter_openai_realtime_api
 issue_tracker: https://github.com/crjfisher/flutter_openai_realtime_api/issues
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
-  flutter: ">=3.13.0"
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: ">=3.19.0"
 
 dependencies:
   flutter:

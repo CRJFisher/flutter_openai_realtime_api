@@ -143,7 +143,10 @@ class OpenAIClientSecretMinter {
   }
 }
 
+/// Thrown when an [EphemeralTokenProvider] cannot mint a token (HTTP error,
+/// malformed response, missing API key, etc.).
 class EphemeralTokenException implements Exception {
+  /// Human-readable description of what went wrong.
   final String message;
   const EphemeralTokenException(this.message);
   @override

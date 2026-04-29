@@ -17,6 +17,10 @@ mixin LoggerMixin {
 class RealtimeLogging {
   static bool _attached = false;
 
+  /// Routes the package's logger to `print`. Subsequent calls are no-ops.
+  ///
+  /// [level] sets the minimum severity that will be printed. Defaults to
+  /// [Level.INFO]; pass [Level.ALL] for verbose debugging.
   static void enableConsoleOutput({Level level = Level.INFO}) {
     if (_attached) return;
     _attached = true;

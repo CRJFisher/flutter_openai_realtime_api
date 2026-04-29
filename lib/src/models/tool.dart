@@ -3,8 +3,14 @@
 /// `parameters` is a JSON Schema object describing the function's argument
 /// shape. The wire format always wraps it with `"type": "function"`.
 class Tool {
+  /// Function name. Must be unique within the session's tool list.
   final String name;
+
+  /// Natural-language description shown to the model so it knows when to
+  /// call the function.
   final String description;
+
+  /// JSON Schema object describing the function's argument shape.
   final Map<String, dynamic> parameters;
 
   const Tool({

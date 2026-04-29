@@ -157,10 +157,18 @@ class ConversationItem {
   }
 }
 
+/// Wire-level item type. Drives JSON serialisation.
 enum ConversationItemType {
+  /// A regular conversation message (user, assistant, or system).
   message('message'),
+
+  /// A model-emitted request to invoke a tool/function.
   functionCall('function_call'),
+
+  /// The client's reply to a [functionCall].
   functionCallOutput('function_call_output'),
+
+  /// The client's reply to a hosted MCP approval request.
   mcpApprovalResponse('mcp_approval_response');
 
   const ConversationItemType(this.id);
@@ -177,9 +185,15 @@ enum ConversationItemType {
   }
 }
 
+/// Lifecycle status of a [ConversationItem] as reported by the server.
 enum ConversationItemStatus {
+  /// The item is still streaming in.
   inProgress('in_progress'),
+
+  /// The item has finished and is in its final form.
   completed('completed'),
+
+  /// The item finished early (e.g. truncation, max_output_tokens).
   incomplete('incomplete');
 
   const ConversationItemStatus(this.id);
@@ -194,9 +208,15 @@ enum ConversationItemStatus {
   }
 }
 
+/// Author role for a message-type conversation item.
 enum ConversationRole {
+  /// The end user of the application.
   user('user'),
+
+  /// The model.
   assistant('assistant'),
+
+  /// System-level instructions.
   system('system');
 
   const ConversationRole(this.id);
@@ -264,14 +284,27 @@ class ContentPart {
   }
 }
 
+/// Wire-level type tag for a [ContentPart].
 enum ContentType {
-  // Pre-GA: `text` was used for assistant output. GA renamed to `output_text`.
+  /// Pre-GA assistant output text. Treat as equivalent to [outputText].
   text('text'),
+
+  /// User-supplied text.
   inputText('input_text'),
+
+  /// User-supplied audio (base64 PCM).
   inputAudio('input_audio'),
+
+  /// User-supplied image (data URL or HTTPS URL).
   inputImage('input_image'),
+
+  /// Assistant text output.
   outputText('output_text'),
+
+  /// Assistant audio output.
   outputAudio('output_audio'),
+
+  /// Unknown / unrecognised content type.
   unknown('');
 
   const ContentType(this.id);

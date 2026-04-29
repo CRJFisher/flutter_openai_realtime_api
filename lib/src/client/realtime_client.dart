@@ -24,7 +24,24 @@ import '../models/turn_detection.dart';
 ///
 /// One client manages one connection. To start a new session after
 /// `dispose()`, construct a fresh client.
+///
+/// Minimal usage:
+///
+/// ```dart
+/// final client = RealtimeClient.webRtc(
+///   RealtimeConfig(
+///     model: 'gpt-realtime',
+///     tokenProvider: OpenAIClientSecretMinter(apiKey: '<server-side-key>'),
+///   ),
+/// );
+/// await client.connect();
+/// client.events.listen((event) => print('event: ${event.runtimeType}'));
+/// await client.sendMessage('Hello!');
+/// // ...
+/// await client.dispose();
+/// ```
 class RealtimeClient with LoggerMixin {
+  /// Configuration for the session: model, modalities, voice, tools, etc.
   final RealtimeConfig config;
   final RealtimeTransport _transport;
 
@@ -76,9 +93,16 @@ class RealtimeClient with LoggerMixin {
   /// `ConnectionEvent`s.
   Stream<RealtimeEvent> get events => _events.stream;
 
+  /// The current transport connection state. Suitable for binding to a
+  /// `ValueListenableBuilder` in a Flutter widget.
   ValueListenable<ConnectionState> get connectionState => _connectionState;
+
+  /// Whether the local microphone is currently muted. Updated by
+  /// [setMuted] and by auto-mute (see [MuteStrategy]).
   ValueListenable<bool> get isMuted => _isMuted;
 
+  /// Server-assigned session id (`sess_…`). `null` until the first
+  /// `session.created` event arrives.
   String? get sessionId => _sessionId;
 
   /// Server-assigned WebRTC call id (`rtc_…`). `null` for WebSocket
@@ -137,6 +161,9 @@ class RealtimeClient with LoggerMixin {
     if (createResponse) await this.createResponse();
   }
 
+  /// Append a [ConversationItem] to the conversation log on the server.
+  /// Use this for system/user messages or for submitting `function_call_output`
+  /// results back to the model.
   Future<void> createConversationItem(ConversationItem item) {
     return _send({
       'event_id': _nextId(),
@@ -156,11 +183,15 @@ class RealtimeClient with LoggerMixin {
     });
   }
 
+  /// WebSocket-only. Commits the pending input audio buffer as a new user
+  /// conversation item. Required when server VAD is disabled.
   Future<void> commitInputAudioBuffer() => _send({
         'event_id': _nextId(),
         'type': Protocol.inputAudioBufferCommit,
       });
 
+  /// WebSocket-only. Discards any pending input audio without creating a
+  /// conversation item.
   Future<void> clearInputAudioBuffer() => _send({
         'event_id': _nextId(),
         'type': Protocol.inputAudioBufferClear,
@@ -184,6 +215,8 @@ class RealtimeClient with LoggerMixin {
     });
   }
 
+  /// Removes a previously-emitted conversation item from the server's
+  /// conversation log.
   Future<void> deleteConversationItem(String itemId) => _send({
         'event_id': _nextId(),
         'type': Protocol.conversationItemDelete,
@@ -230,6 +263,9 @@ class RealtimeClient with LoggerMixin {
     });
   }
 
+  /// Cancels the in-flight response, if any. Combine with
+  /// [clearOutputAudioBuffer] and [truncateConversation] to implement
+  /// barge-in.
   Future<void> cancelResponse() => _send({
         'event_id': _nextId(),
         'type': Protocol.responseCancel,

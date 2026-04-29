@@ -1,7 +1,7 @@
 /// Flutter client for the OpenAI Realtime API (WebRTC + WebSocket).
 ///
 /// Public entry point: [RealtimeClient].
-library flutter_openai_realtime_api;
+library;
 
 export 'src/auth/ephemeral_token.dart'
     show

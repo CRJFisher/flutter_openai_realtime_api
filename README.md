@@ -1,10 +1,22 @@
 # flutter_openai_realtime_api
 
+[![pub package](https://img.shields.io/pub/v/flutter_openai_realtime_api.svg)](https://pub.dev/packages/flutter_openai_realtime_api)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/crjfisher/flutter_openai_realtime_api/actions/workflows/ci.yml/badge.svg)](https://github.com/crjfisher/flutter_openai_realtime_api/actions/workflows/ci.yml)
+
 Flutter client for the OpenAI Realtime GA API. Targets `gpt-realtime` over
 WebRTC for low-latency voice conversations and over WebSocket for
 server-side or text-only use.
 
+Full API reference: <https://pub.dev/documentation/flutter_openai_realtime_api/latest/>
+
 ## Install
+
+```sh
+flutter pub add flutter_openai_realtime_api
+```
+
+Or add manually:
 
 ```yaml
 dependencies:
@@ -44,6 +56,26 @@ The same client supports text only:
 ```dart
 await client.sendMessage('Summarise the conversation so far.');
 ```
+
+### WebSocket transport
+
+For server-side Dart (Cloud Functions, Shelf, CLIs) or text-only Flutter
+clients, use the WebSocket transport. Browsers cannot set the
+`Authorization` header on a WebSocket upgrade, so this transport is not
+appropriate for Flutter Web.
+
+```dart
+final client = RealtimeClient.webSocket(RealtimeConfig(
+  apiKey: openAiKey, // long-lived sk-… key, server-side only
+));
+
+await client.connect();
+await client.sendMessage('Generate a haiku about caching.');
+await client.dispose();
+```
+
+Choose WebRTC for voice from a Flutter app; choose WebSocket for
+server-side workloads or when you only need text round-trips.
 
 ## Backend setup
 
@@ -276,7 +308,7 @@ For background audio:
 `android/app/build.gradle`:
 
 ```gradle
-android { defaultConfig { minSdkVersion 23 } }   // flutter_webrtc requires 23+
+android { defaultConfig { minSdkVersion 21 } }   // flutter_webrtc minimum
 ```
 
 Use `permission_handler` (or similar) at runtime to request microphone
@@ -288,6 +320,14 @@ Must be served over HTTPS (or `localhost`). Browsers will not autoplay
 audio until the page has had a user gesture, so gate `connect()`
 behind a button tap.
 
+The package does not auto-attach the remote audio track to a DOM
+`<audio>` element on Web — Flutter's rendering layer cannot reach the
+browser's audio output without help. In your app, listen for the
+`onTrack` event on the underlying `RTCPeerConnection` (exposed via
+`flutter_webrtc`) and route the remote `MediaStream` to an `<audio>`
+element through `flutter_webrtc`'s renderer or a small JS interop call.
+Native platforms wire this automatically.
+
 ### macOS
 
 `macos/Runner/Info.plist`:
@@ -297,11 +337,18 @@ behind a button tap.
 <string>Used for voice conversations.</string>
 ```
 
-`macos/Runner/*.entitlements`:
+Apply the same two keys to **both** `macos/Runner/DebugProfile.entitlements`
+**and** `macos/Runner/Release.entitlements`:
 
 ```xml
-<key>com.apple.security.device.audio-input</key><true/>
+<key>com.apple.security.device.audio-input</key>
+<true/>
+<key>com.apple.security.network.client</key>
+<true/>
 ```
+
+`network.client` is required for the outbound HTTPS SDP exchange; the
+hardened runtime blocks it otherwise.
 
 ## Voice and model selection
 

@@ -118,3 +118,6 @@ doc/api/
 # Package files
 *.tar.gz
 *.zip
+# Library pubspec.lock — not committed for published packages
+pubspec.lock
+!example/pubspec.lock

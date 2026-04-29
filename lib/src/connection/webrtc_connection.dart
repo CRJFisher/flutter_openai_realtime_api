@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
 
 import '../internal/logger.dart';
@@ -260,33 +260,27 @@ class RealtimeWebRtcTransport with LoggerMixin implements RealtimeTransport {
     final bearer = await _config.resolveBearerToken();
     final url = Uri.parse('${_config.effectiveBaseUrl}${Protocol.callsPath}');
 
-    final client = HttpClient();
-    try {
-      final req = await client.postUrl(url);
-      req.headers.set('Authorization', 'Bearer $bearer');
-      req.headers.set('Content-Type', 'application/sdp');
-      req.write(offerSdp);
-      final resp = await req.close();
+    final resp = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $bearer',
+        'Content-Type': 'application/sdp',
+      },
+      body: offerSdp,
+    );
 
-      if (resp.statusCode == 200 || resp.statusCode == 201) {
-        // Capture the call id from the Location header. Not all platforms
-        // surface response headers via flutter's HttpClient cleanly; defend
-        // against null.
-        final location = resp.headers.value(HttpHeaders.locationHeader);
-        if (location != null) {
-          final segments = location.split('/');
-          _callId = segments.isNotEmpty ? segments.last : null;
-        }
-        return resp.transform(utf8.decoder).join();
+    if (resp.statusCode == 200 || resp.statusCode == 201) {
+      final location = resp.headers['location'];
+      if (location != null) {
+        final segments = location.split('/');
+        _callId = segments.isNotEmpty ? segments.last : null;
       }
-
-      final body = await resp.transform(utf8.decoder).join();
-      throw StateError(
-        'SDP exchange failed: ${resp.statusCode} ${resp.reasonPhrase} — $body',
-      );
-    } finally {
-      client.close();
+      return resp.body;
     }
+
+    throw StateError(
+      'SDP exchange failed: ${resp.statusCode} ${resp.reasonPhrase} — ${resp.body}',
+    );
   }
 
   Future<void> _teardown() async {

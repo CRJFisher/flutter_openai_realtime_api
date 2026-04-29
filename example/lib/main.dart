@@ -70,7 +70,10 @@ class _DemoPageState extends State<_DemoPage> {
     final minter = OpenAIClientSecretMinter(apiKey: apiKey);
     final tokenProvider = CachingEphemeralTokenProvider(
       fetcher: () => minter.mint(
-        sessionConfig: {'type': 'realtime', 'model': RealtimeModel.gptRealtime.id},
+        sessionConfig: {
+          'type': 'realtime',
+          'model': RealtimeModel.gptRealtime.id
+        },
         expiresInSeconds: 120,
       ),
     );

@@ -17,9 +17,7 @@ import 'realtime_transport.dart';
 /// transport: browsers cannot set the `Authorization` header on a WebSocket
 /// upgrade, so client-side WebSocket use requires the OpenAI-specific
 /// subprotocol auth hack which is not robust.
-class RealtimeWebSocketTransport
-    with LoggerMixin
-    implements RealtimeTransport {
+class RealtimeWebSocketTransport with LoggerMixin implements RealtimeTransport {
   final RealtimeConfig _config;
 
   WebSocketChannel? _channel;
@@ -55,8 +53,7 @@ class RealtimeWebSocketTransport
 
     try {
       final bearer = await _config.resolveBearerToken();
-      final base = _config
-          .effectiveBaseUrl
+      final base = _config.effectiveBaseUrl
           .replaceFirst('https://', 'wss://')
           .replaceFirst('http://', 'ws://');
       final uri = Uri.parse(

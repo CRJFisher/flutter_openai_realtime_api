@@ -196,6 +196,7 @@ class RealtimeClient with LoggerMixin {
     ToolChoice? toolChoice,
     double? temperature,
     int? maxOutputTokens,
+
     /// Pass `"none"` for an out-of-band response that does not affect
     /// the conversation history.
     String? conversation,
@@ -262,8 +263,7 @@ class RealtimeClient with LoggerMixin {
         'audio': {
           if (turnDetection != null)
             'input': {'turn_detection': turnDetection.toJson()},
-          if (voice != null)
-            'output': {'voice': voice.id},
+          if (voice != null) 'output': {'voice': voice.id},
         },
       if (tools != null) 'tools': tools.map((t) => t.toJson()).toList(),
       if (toolChoice != null) 'tool_choice': toolChoice.toJson(),

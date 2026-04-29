@@ -20,11 +20,11 @@ class Tool {
   });
 
   Map<String, dynamic> toJson() => {
-        'type': 'function',
-        'name': name,
-        'description': description,
-        'parameters': parameters,
-      };
+    'type': 'function',
+    'name': name,
+    'description': description,
+    'parameters': parameters,
+  };
 }
 
 /// How the model should choose between tools.
@@ -69,7 +69,7 @@ class _ToolChoiceFunction extends ToolChoice {
   const _ToolChoiceFunction(this.name);
   @override
   Object toJson() => {
-        'type': 'function',
-        'function': {'name': name},
-      };
+    'type': 'function',
+    'function': {'name': name},
+  };
 }

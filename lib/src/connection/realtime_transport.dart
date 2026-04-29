@@ -3,12 +3,7 @@
 /// This is what callers see via `RealtimeClient.connectionState`. It does
 /// not distinguish protocol-level state (e.g. session.created received) —
 /// for that, listen to `RealtimeClient.events`.
-enum ConnectionState {
-  disconnected,
-  connecting,
-  connected,
-  failed,
-}
+enum ConnectionState { disconnected, connecting, connected, failed }
 
 /// Internal: minimal transport contract used by [RealtimeClient].
 ///

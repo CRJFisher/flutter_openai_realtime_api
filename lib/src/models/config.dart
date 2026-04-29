@@ -79,14 +79,14 @@ class RealtimeConfig {
     this.enableEchoCancellation = true,
     this.enableNoiseSuppression = true,
     this.enableAutoGainControl = true,
-  })  : assert(
-          apiKey != null || tokenProvider != null,
-          'RealtimeConfig requires either apiKey or tokenProvider.',
-        ),
-        assert(
-          apiKey == null || tokenProvider == null,
-          'RealtimeConfig: pass apiKey OR tokenProvider, not both.',
-        );
+  }) : assert(
+         apiKey != null || tokenProvider != null,
+         'RealtimeConfig requires either apiKey or tokenProvider.',
+       ),
+       assert(
+         apiKey == null || tokenProvider == null,
+         'RealtimeConfig: pass apiKey OR tokenProvider, not both.',
+       );
 
   /// Body for `session.update` and the `session` field in
   /// `client_secrets` requests. Uses the GA discriminated `audio.{input,

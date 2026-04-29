@@ -72,24 +72,27 @@ class _DemoPageState extends State<_DemoPage> {
       fetcher: () => minter.mint(
         sessionConfig: {
           'type': 'realtime',
-          'model': RealtimeModel.gptRealtime.id
+          'model': RealtimeModel.gptRealtime.id,
         },
         expiresInSeconds: 120,
       ),
     );
 
-    final client = RealtimeClient.webRtc(RealtimeConfig(
-      tokenProvider: tokenProvider,
-      voice: Voice.alloy,
-      instructions: 'You are a helpful, concise assistant. '
-          'Keep replies to one or two sentences.',
-      turnDetection: const ServerVad.quick(),
-      muteStrategy: MuteStrategy.auto,
-      inputAudioTranscription: const TranscriptionConfig(
-        model: TranscriptionModel.whisper1,
-        language: 'en',
+    final client = RealtimeClient.webRtc(
+      RealtimeConfig(
+        tokenProvider: tokenProvider,
+        voice: Voice.alloy,
+        instructions:
+            'You are a helpful, concise assistant. '
+            'Keep replies to one or two sentences.',
+        turnDetection: const ServerVad.quick(),
+        muteStrategy: MuteStrategy.auto,
+        inputAudioTranscription: const TranscriptionConfig(
+          model: TranscriptionModel.whisper1,
+          language: 'en',
+        ),
       ),
-    ));
+    );
 
     _sub = client.events.listen(_onEvent);
     setState(() => _client = client);

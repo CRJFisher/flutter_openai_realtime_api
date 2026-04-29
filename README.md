@@ -337,7 +337,7 @@ Native platforms wire this automatically.
 <string>Used for voice conversations.</string>
 ```
 
-Apply the same two keys to **both** `macos/Runner/DebugProfile.entitlements`
+Apply the same three keys to **both** `macos/Runner/DebugProfile.entitlements`
 **and** `macos/Runner/Release.entitlements`:
 
 ```xml
@@ -345,10 +345,16 @@ Apply the same two keys to **both** `macos/Runner/DebugProfile.entitlements`
 <true/>
 <key>com.apple.security.network.client</key>
 <true/>
+<key>com.apple.security.network.server</key>
+<true/>
 ```
 
-`network.client` is required for the outbound HTTPS SDP exchange; the
-hardened runtime blocks it otherwise.
+`network.client` is required for the outbound HTTPS SDP exchange.
+`network.server` is required for WebRTC media: the sandboxed app must
+accept inbound UDP for ICE/RTP to flow.
+
+The example app at `example/macos/` ships with these set up — copy it
+as a working reference if you'd rather not edit the plists by hand.
 
 ## Voice and model selection
 

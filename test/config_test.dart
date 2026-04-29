@@ -4,9 +4,9 @@ import 'package:flutter_openai_realtime_api/flutter_openai_realtime_api.dart';
 class _StubProvider implements EphemeralTokenProvider {
   @override
   Future<EphemeralToken> getToken() async => EphemeralToken(
-        value: 'ek_test',
-        expiresAt: DateTime.now().add(const Duration(minutes: 5)),
-      );
+    value: 'ek_test',
+    expiresAt: DateTime.now().add(const Duration(minutes: 5)),
+  );
 }
 
 void main() {
@@ -50,8 +50,9 @@ void main() {
         apiKey: 'sk-test',
         turnDetection: SemanticVad(eagerness: VadEagerness.high),
       ).toSessionJson();
-      final td = ((json['audio'] as Map)['input'] as Map)['turn_detection']
-          as Map<String, dynamic>;
+      final td =
+          ((json['audio'] as Map)['input'] as Map)['turn_detection']
+              as Map<String, dynamic>;
       expect(td['type'], 'semantic_vad');
       expect(td['eagerness'], 'high');
     });
@@ -77,9 +78,9 @@ void main() {
             parameters: {
               'type': 'object',
               'properties': {
-                'location': {'type': 'string'}
+                'location': {'type': 'string'},
               },
-              'required': ['location']
+              'required': ['location'],
             },
           ),
         ],
@@ -119,10 +120,7 @@ void main() {
       expect(() => RealtimeConfig(), throwsA(isA<AssertionError>()));
       // Both set
       expect(
-        () => RealtimeConfig(
-          apiKey: 'sk-test',
-          tokenProvider: _StubProvider(),
-        ),
+        () => RealtimeConfig(apiKey: 'sk-test', tokenProvider: _StubProvider()),
         throwsA(isA<AssertionError>()),
       );
     });
@@ -133,21 +131,18 @@ void main() {
       // Reviewer 5 caught: prior enum had `fable`, `nova`, `onyx` (TTS-
       // only voices the Realtime server rejects) and was missing `sage`,
       // `marin`, `cedar`.
-      expect(
-        Voice.values.map((v) => v.id).toSet(),
-        {
-          'alloy',
-          'ash',
-          'ballad',
-          'coral',
-          'echo',
-          'sage',
-          'shimmer',
-          'verse',
-          'marin',
-          'cedar',
-        },
-      );
+      expect(Voice.values.map((v) => v.id).toSet(), {
+        'alloy',
+        'ash',
+        'ballad',
+        'coral',
+        'echo',
+        'sage',
+        'shimmer',
+        'verse',
+        'marin',
+        'cedar',
+      });
     });
   });
 
@@ -155,14 +150,11 @@ void main() {
     test('contains only current GA models', () {
       // Reviewer 5 caught: deprecated `gpt-4o-realtime-preview-*` were
       // included in the prior enum.
-      expect(
-        RealtimeModel.values.map((m) => m.id).toSet(),
-        {
-          'gpt-realtime',
-          'gpt-realtime-mini',
-          'gpt-realtime-2025-08-28',
-        },
-      );
+      expect(RealtimeModel.values.map((m) => m.id).toSet(), {
+        'gpt-realtime',
+        'gpt-realtime-mini',
+        'gpt-realtime-2025-08-28',
+      });
     });
   });
 }

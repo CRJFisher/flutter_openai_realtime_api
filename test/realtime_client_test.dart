@@ -62,35 +62,35 @@ class FakeTransport implements RealtimeTransport {
       _messages.add(jsonEncode(event));
 }
 
-RealtimeClient _newClient(FakeTransport fake) =>
-    RealtimeClient.withTransport(
-      const RealtimeConfig(
-        apiKey: 'sk-test',
-        muteStrategy: MuteStrategy.off,
-      ),
-      fake,
-    );
+RealtimeClient _newClient(FakeTransport fake) => RealtimeClient.withTransport(
+  const RealtimeConfig(apiKey: 'sk-test', muteStrategy: MuteStrategy.off),
+  fake,
+);
 
 void main() {
   group('RealtimeClient', () {
-    test('connect drives state to connected and emits ConnectionConnected', () async {
-      final fake = FakeTransport();
-      final client = _newClient(fake);
-      final received = <RealtimeEvent>[];
-      final sub = client.events.listen(received.add);
+    test(
+      'connect drives state to connected and emits ConnectionConnected',
+      () async {
+        final fake = FakeTransport();
+        final client = _newClient(fake);
+        final received = <RealtimeEvent>[];
+        final sub = client.events.listen(received.add);
 
-      await client.connect();
-      await Future.delayed(Duration.zero);
+        await client.connect();
+        await Future.delayed(Duration.zero);
 
-      expect(client.connectionState.value, ConnectionState.connected);
-      expect(received.whereType<ConnectionConnected>(), hasLength(1));
-      expect(fake.outbound, hasLength(1));
-      final firstMsg = jsonDecode(fake.outbound.single) as Map<String, dynamic>;
-      expect(firstMsg['type'], 'session.update');
+        expect(client.connectionState.value, ConnectionState.connected);
+        expect(received.whereType<ConnectionConnected>(), hasLength(1));
+        expect(fake.outbound, hasLength(1));
+        final firstMsg =
+            jsonDecode(fake.outbound.single) as Map<String, dynamic>;
+        expect(firstMsg['type'], 'session.update');
 
-      await sub.cancel();
-      await client.dispose();
-    });
+        await sub.cancel();
+        await client.dispose();
+      },
+    );
 
     test('session.created sets sessionId and emits SessionCreated', () async {
       final fake = FakeTransport();
@@ -133,26 +133,29 @@ void main() {
       await client.dispose();
     });
 
-    test('sendMessage emits conversation.item.create then response.create',
-        () async {
-      final fake = FakeTransport();
-      final client = _newClient(fake);
+    test(
+      'sendMessage emits conversation.item.create then response.create',
+      () async {
+        final fake = FakeTransport();
+        final client = _newClient(fake);
 
-      await client.sendMessage('hello there');
-      await Future.delayed(Duration.zero);
+        await client.sendMessage('hello there');
+        await Future.delayed(Duration.zero);
 
-      expect(fake.outbound, hasLength(2));
-      final first = jsonDecode(fake.outbound[0]) as Map<String, dynamic>;
-      final second = jsonDecode(fake.outbound[1]) as Map<String, dynamic>;
-      expect(first['type'], 'conversation.item.create');
-      expect(second['type'], 'response.create');
+        expect(fake.outbound, hasLength(2));
+        final first = jsonDecode(fake.outbound[0]) as Map<String, dynamic>;
+        final second = jsonDecode(fake.outbound[1]) as Map<String, dynamic>;
+        expect(first['type'], 'conversation.item.create');
+        expect(second['type'], 'response.create');
 
-      // The user text appears in the first message's item.content.
-      final content = ((first['item'] as Map)['content'] as List).first as Map;
-      expect(content['text'], 'hello there');
+        // The user text appears in the first message's item.content.
+        final content =
+            ((first['item'] as Map)['content'] as List).first as Map;
+        expect(content['text'], 'hello there');
 
-      await client.dispose();
-    });
+        await client.dispose();
+      },
+    );
 
     test('setMuted toggles isMuted and forwards to transport', () async {
       final fake = FakeTransport();

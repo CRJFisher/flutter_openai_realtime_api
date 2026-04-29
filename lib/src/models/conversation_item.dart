@@ -2,10 +2,20 @@ import 'dart:convert';
 
 /// An item in the conversation history.
 class ConversationItem {
+  /// Server-assigned id, or `null` if the client is constructing the item.
   final String? id;
+
+  /// Wire-level kind: message, function call, function-call output, …
   final ConversationItemType type;
+
+  /// Lifecycle status as reported by the server. `null` for client-built
+  /// items not yet acknowledged.
   final ConversationItemStatus? status;
+
+  /// Author role for message items. `null` for non-message types.
   final ConversationRole? role;
+
+  /// Structured content parts for message items.
   final List<ContentPart> content;
 
   /// Function call: server-assigned ID linking call to its output.
@@ -58,13 +68,12 @@ class ConversationItem {
   factory ConversationItem.assistantMessage({
     String? id,
     required String text,
-  }) =>
-      ConversationItem(
-        id: id,
-        type: ConversationItemType.message,
-        role: ConversationRole.assistant,
-        content: [ContentPart.outputText(text)],
-      );
+  }) => ConversationItem(
+    id: id,
+    type: ConversationItemType.message,
+    role: ConversationRole.assistant,
+    content: [ContentPart.outputText(text)],
+  );
 
   /// System message (instructions). Use [RealtimeConfig.instructions]
   /// instead for the session-level system prompt.
@@ -81,27 +90,25 @@ class ConversationItem {
   factory ConversationItem.functionCallOutput({
     required String callId,
     required String output,
-  }) =>
-      ConversationItem(
-        type: ConversationItemType.functionCallOutput,
-        callId: callId,
-        output: output,
-      );
+  }) => ConversationItem(
+    type: ConversationItemType.functionCallOutput,
+    callId: callId,
+    output: output,
+  );
 
   /// Approval response for a hosted MCP tool call that the server requested
   /// approval for.
   factory ConversationItem.mcpApprovalResponse({
     required String approvalRequestId,
     required bool approve,
-  }) =>
-      ConversationItem(
-        type: ConversationItemType.mcpApprovalResponse,
-        // We reuse `name` to carry the approval-request id; the JSON
-        // serializer remaps it.
-        name: approvalRequestId,
-        // and `output` to carry the boolean.
-        output: approve.toString(),
-      );
+  }) => ConversationItem(
+    type: ConversationItemType.mcpApprovalResponse,
+    // We reuse `name` to carry the approval-request id; the JSON
+    // serializer remaps it.
+    name: approvalRequestId,
+    // and `output` to carry the boolean.
+    output: approve.toString(),
+  );
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{'type': type.id};
@@ -141,7 +148,8 @@ class ConversationItem {
       type: type,
       status: ConversationItemStatus.fromId(json['status'] as String?),
       role: ConversationRole.fromId(json['role'] as String?),
-      content: (json['content'] as List<dynamic>?)
+      content:
+          (json['content'] as List<dynamic>?)
               ?.map((c) => ContentPart.fromJson(c as Map<String, dynamic>))
               .toList() ??
           const [],
@@ -150,8 +158,8 @@ class ConversationItem {
       arguments: argsRaw is String
           ? argsRaw
           : argsRaw is Map
-              ? jsonEncode(argsRaw)
-              : null,
+          ? jsonEncode(argsRaw)
+          : null,
       output: json['output'] as String?,
     );
   }
@@ -233,10 +241,19 @@ enum ConversationRole {
 
 /// One part of the structured content of a conversation message item.
 class ContentPart {
+  /// Wire-level type tag. Drives which other fields are populated.
   final ContentType type;
+
+  /// Textual content for `input_text`, `output_text`, or `text` parts.
   final String? text;
+
+  /// Base64-encoded PCM audio for `input_audio` / `output_audio`.
   final String? audio;
+
+  /// Transcript that accompanies an audio part, when reported.
   final String? transcript;
+
+  /// Image source for `input_image`. Either a `data:` URL or HTTPS URL.
   final String? imageUrl;
 
   const ContentPart({
@@ -247,17 +264,27 @@ class ContentPart {
     this.imageUrl,
   });
 
+  /// User-supplied text content.
   factory ContentPart.inputText(String text) =>
       ContentPart(type: ContentType.inputText, text: text);
+
+  /// User-supplied audio content (base64 PCM, optional transcript).
   factory ContentPart.inputAudio({required String audio, String? transcript}) =>
       ContentPart(
-          type: ContentType.inputAudio, audio: audio, transcript: transcript);
+        type: ContentType.inputAudio,
+        audio: audio,
+        transcript: transcript,
+      );
+
+  /// User-supplied image content. [imageUrl] is a `data:` URL or HTTPS URL.
   factory ContentPart.inputImage(String imageUrl) =>
       ContentPart(type: ContentType.inputImage, imageUrl: imageUrl);
 
-  /// Output text from the assistant (GA name).
+  /// Assistant text output.
   factory ContentPart.outputText(String text) =>
       ContentPart(type: ContentType.outputText, text: text);
+
+  /// Assistant audio output (base64 PCM, optional transcript).
   factory ContentPart.outputAudio({String? audio, String? transcript}) =>
       ContentPart(
         type: ContentType.outputAudio,
@@ -266,12 +293,12 @@ class ContentPart {
       );
 
   Map<String, dynamic> toJson() => {
-        'type': type.id,
-        if (text != null) 'text': text,
-        if (audio != null) 'audio': audio,
-        if (transcript != null) 'transcript': transcript,
-        if (imageUrl != null) 'image_url': imageUrl,
-      };
+    'type': type.id,
+    if (text != null) 'text': text,
+    if (audio != null) 'audio': audio,
+    if (transcript != null) 'transcript': transcript,
+    if (imageUrl != null) 'image_url': imageUrl,
+  };
 
   factory ContentPart.fromJson(Map<String, dynamic> json) {
     return ContentPart(
@@ -286,7 +313,8 @@ class ContentPart {
 
 /// Wire-level type tag for a [ContentPart].
 enum ContentType {
-  /// Pre-GA assistant output text. Treat as equivalent to [outputText].
+  /// Plain `text` content tag. Equivalent to [outputText] for assistant
+  /// messages.
   text('text'),
 
   /// User-supplied text.

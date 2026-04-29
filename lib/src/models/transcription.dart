@@ -29,8 +29,8 @@ class TranscriptionConfig {
   });
 
   Map<String, dynamic> toJson() => {
-        'model': model.id,
-        if (language != null) 'language': language,
-        if (prompt != null) 'prompt': prompt,
-      };
+    'model': model.id,
+    if (language != null) 'language': language,
+    if (prompt != null) 'prompt': prompt,
+  };
 }

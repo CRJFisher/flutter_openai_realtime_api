@@ -43,40 +43,28 @@ final class ServerVad extends TurnDetection {
 
   /// Sensitive: fast turn-taking, suitable for snappy chat.
   const ServerVad.quick()
-      : this(
-          threshold: 0.5,
-          prefixPaddingMs: 300,
-          silenceDurationMs: 500,
-        );
+    : this(threshold: 0.5, prefixPaddingMs: 300, silenceDurationMs: 500);
 
   /// Patient: longer pauses tolerated. Suitable for thoughtful conversation.
   const ServerVad.patient()
-      : this(
-          threshold: 0.8,
-          prefixPaddingMs: 800,
-          silenceDurationMs: 2500,
-        );
+    : this(threshold: 0.8, prefixPaddingMs: 800, silenceDurationMs: 2500);
 
   /// Aggressive thresholds tuned to suppress feedback on devices with
   /// poor hardware echo cancellation (e.g. Android without headphones).
   /// Use together with `MuteStrategy.aggressive`.
   const ServerVad.preventFeedback()
-      : this(
-          threshold: 0.9,
-          prefixPaddingMs: 1000,
-          silenceDurationMs: 3500,
-        );
+    : this(threshold: 0.9, prefixPaddingMs: 1000, silenceDurationMs: 3500);
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'server_vad',
-        if (threshold != null) 'threshold': threshold,
-        if (prefixPaddingMs != null) 'prefix_padding_ms': prefixPaddingMs,
-        if (silenceDurationMs != null) 'silence_duration_ms': silenceDurationMs,
-        if (idleTimeoutMs != null) 'idle_timeout_ms': idleTimeoutMs,
-        if (createResponse != null) 'create_response': createResponse,
-        if (interruptResponse != null) 'interrupt_response': interruptResponse,
-      };
+    'type': 'server_vad',
+    if (threshold != null) 'threshold': threshold,
+    if (prefixPaddingMs != null) 'prefix_padding_ms': prefixPaddingMs,
+    if (silenceDurationMs != null) 'silence_duration_ms': silenceDurationMs,
+    if (idleTimeoutMs != null) 'idle_timeout_ms': idleTimeoutMs,
+    if (createResponse != null) 'create_response': createResponse,
+    if (interruptResponse != null) 'interrupt_response': interruptResponse,
+  };
 }
 
 /// Eagerness of semantic VAD.
@@ -106,9 +94,9 @@ final class SemanticVad extends TurnDetection {
 
   @override
   Map<String, dynamic> toJson() => {
-        'type': 'semantic_vad',
-        if (eagerness != null) 'eagerness': eagerness!.id,
-        if (createResponse != null) 'create_response': createResponse,
-        if (interruptResponse != null) 'interrupt_response': interruptResponse,
-      };
+    'type': 'semantic_vad',
+    if (eagerness != null) 'eagerness': eagerness!.id,
+    if (createResponse != null) 'create_response': createResponse,
+    if (interruptResponse != null) 'interrupt_response': interruptResponse,
+  };
 }

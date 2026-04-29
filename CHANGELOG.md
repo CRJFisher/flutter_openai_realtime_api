@@ -4,6 +4,41 @@ The 0.1.x and 0.2.x history was internal/private; 0.3.0 is the first public rele
 
 ## [Unreleased]
 
+### Breaking
+
+- Raise SDK floor to Dart `>=3.8.0` and Flutter `>=3.32.0`. Required by
+  the new `flutter_lints ^6.0.0` dev dependency.
+- Bump `web_socket_channel` to `^3.0.0` (major version). Consumers
+  pinned to v2 may need to migrate.
+
+### Added
+
+- macOS scaffolding in `example/` with the microphone usage description
+  and the `audio-input` / `network.client` / `network.server`
+  entitlements wired up in both Debug and Release.
+- GitHub Actions CI workflow (`analyze` + `test` on Ubuntu and macOS).
+- Unit tests for `RealtimeClient` lifecycle, event dispatch, and
+  dispose semantics via a fake transport.
+
+### Fixed
+
+- WebRTC SDP exchange uses `package:http` instead of `dart:io.HttpClient`
+  so Flutter Web can compile the package.
+
+### Changed
+
+- Bump dev dependency `flutter_lints` to `^6.0.0` and runtime dependency
+  `rxdart` to `^0.28.0`.
+
+### Docs
+
+- Dartdoc on the public API: every concrete event class, `RealtimeClient`
+  members (with a class-level usage example), `ConversationItem` enums,
+  `ContentPart`, `Tool`, `EphemeralTokenException`, and `RealtimeLogging`.
+- README polish for pub.dev: install command, badges, accurate
+  `minSdkVersion`, complete macOS entitlements, Web caller-side audio
+  wiring, WebSocket transport quickstart, link to dartdoc.
+
 ## [0.3.0] - 2026-04-29
 
 Targets the OpenAI Realtime GA API. Breaks every name from 0.2.x.

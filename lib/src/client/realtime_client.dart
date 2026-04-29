@@ -25,17 +25,18 @@ import '../models/turn_detection.dart';
 /// One client manages one connection. To start a new session after
 /// `dispose()`, construct a fresh client.
 ///
-/// Minimal usage:
+/// Minimal usage with an [EphemeralTokenProvider] wired to your backend:
 ///
 /// ```dart
 /// final client = RealtimeClient.webRtc(
 ///   RealtimeConfig(
-///     model: 'gpt-realtime',
-///     tokenProvider: OpenAIClientSecretMinter(apiKey: '<server-side-key>'),
+///     tokenProvider: CachingEphemeralTokenProvider(
+///       fetcher: () => fetchTokenFromMyBackend(),
+///     ),
 ///   ),
 /// );
-/// await client.connect();
 /// client.events.listen((event) => print('event: ${event.runtimeType}'));
+/// await client.connect();
 /// await client.sendMessage('Hello!');
 /// // ...
 /// await client.dispose();
@@ -82,8 +83,7 @@ class RealtimeClient with LoggerMixin {
   factory RealtimeClient.withTransport(
     RealtimeConfig config,
     RealtimeTransport transport,
-  ) =>
-      RealtimeClient._(config, transport);
+  ) => RealtimeClient._(config, transport);
 
   // ---------------------------------------------------------------------------
   // Public state
@@ -172,9 +172,9 @@ class RealtimeClient with LoggerMixin {
     });
   }
 
-  /// WebSocket-only. Append a chunk of input audio to the server-side
-  /// buffer. No-op semantically meaningful in WebRTC mode (audio flows
-  /// over the RTC track), but the server will accept and ignore the event.
+  /// Append a chunk of input audio to the server-side buffer. WebSocket
+  /// transports send audio this way; WebRTC carries audio over the RTC
+  /// track instead, but the server will still accept and ignore this event.
   Future<void> appendInputAudioBuffer(List<int> bytes) {
     return _send({
       'event_id': _nextId(),
@@ -183,19 +183,16 @@ class RealtimeClient with LoggerMixin {
     });
   }
 
-  /// WebSocket-only. Commits the pending input audio buffer as a new user
-  /// conversation item. Required when server VAD is disabled.
-  Future<void> commitInputAudioBuffer() => _send({
-        'event_id': _nextId(),
-        'type': Protocol.inputAudioBufferCommit,
-      });
+  /// Commits the pending input audio buffer as a new user conversation
+  /// item. Required when `turnDetection` is null (manual / push-to-talk
+  /// mode); a no-op when server VAD is enabled.
+  Future<void> commitInputAudioBuffer() =>
+      _send({'event_id': _nextId(), 'type': Protocol.inputAudioBufferCommit});
 
-  /// WebSocket-only. Discards any pending input audio without creating a
-  /// conversation item.
-  Future<void> clearInputAudioBuffer() => _send({
-        'event_id': _nextId(),
-        'type': Protocol.inputAudioBufferClear,
-      });
+  /// Discards any pending input audio without creating a conversation item.
+  /// Useful in manual mode (`turnDetection: null`).
+  Future<void> clearInputAudioBuffer() =>
+      _send({'event_id': _nextId(), 'type': Protocol.inputAudioBufferClear});
 
   /// Truncates a previously-emitted assistant item. Use this together
   /// with [cancelResponse] and [clearOutputAudioBuffer] when implementing
@@ -218,10 +215,10 @@ class RealtimeClient with LoggerMixin {
   /// Removes a previously-emitted conversation item from the server's
   /// conversation log.
   Future<void> deleteConversationItem(String itemId) => _send({
-        'event_id': _nextId(),
-        'type': Protocol.conversationItemDelete,
-        'item_id': itemId,
-      });
+    'event_id': _nextId(),
+    'type': Protocol.conversationItemDelete,
+    'item_id': itemId,
+  });
 
   // ---------------------------------------------------------------------------
   // Response control
@@ -247,14 +244,14 @@ class RealtimeClient with LoggerMixin {
     final response = <String, dynamic>{
       if (outputModalities != null)
         'output_modalities': outputModalities.map((m) => m.id).toList(),
-      if (instructions != null) 'instructions': instructions,
+      'instructions': ?instructions,
       if (voice != null) 'voice': voice.id,
       if (tools != null) 'tools': tools.map((t) => t.toJson()).toList(),
       if (toolChoice != null) 'tool_choice': toolChoice.toJson(),
-      if (temperature != null) 'temperature': temperature,
-      if (maxOutputTokens != null) 'max_output_tokens': maxOutputTokens,
-      if (conversation != null) 'conversation': conversation,
-      if (metadata != null) 'metadata': metadata,
+      'temperature': ?temperature,
+      'max_output_tokens': ?maxOutputTokens,
+      'conversation': ?conversation,
+      'metadata': ?metadata,
     };
     return _send({
       'event_id': _nextId(),
@@ -263,24 +260,22 @@ class RealtimeClient with LoggerMixin {
     });
   }
 
-  /// Cancels the in-flight response, if any. Combine with
-  /// [clearOutputAudioBuffer] and [truncateConversation] to implement
-  /// barge-in.
-  Future<void> cancelResponse() => _send({
-        'event_id': _nextId(),
-        'type': Protocol.responseCancel,
-      });
+  /// Cancels the in-flight response, if any. For barge-in, also call
+  /// [truncateConversation] with the playback position. On WebRTC,
+  /// additionally call [clearOutputAudioBuffer] to flush queued audio.
+  Future<void> cancelResponse() =>
+      _send({'event_id': _nextId(), 'type': Protocol.responseCancel});
 
   /// WebRTC-only. Tells the server to stop streaming any queued audio
-  /// for the current response. The full barge-in sequence is:
+  /// for the current response. The full WebRTC barge-in sequence is:
   ///
   /// 1. [cancelResponse]
   /// 2. [clearOutputAudioBuffer]
   /// 3. [truncateConversation] with the playback position
-  Future<void> clearOutputAudioBuffer() => _send({
-        'event_id': _nextId(),
-        'type': Protocol.outputAudioBufferClear,
-      });
+  ///
+  /// On WebSocket, omit step 2.
+  Future<void> clearOutputAudioBuffer() =>
+      _send({'event_id': _nextId(), 'type': Protocol.outputAudioBufferClear});
 
   // ---------------------------------------------------------------------------
   // Session updates
@@ -303,7 +298,7 @@ class RealtimeClient with LoggerMixin {
       'type': 'realtime',
       if (outputModalities != null)
         'output_modalities': outputModalities.map((m) => m.id).toList(),
-      if (instructions != null) 'instructions': instructions,
+      'instructions': ?instructions,
       if (voice != null || turnDetection != null)
         'audio': {
           if (turnDetection != null)
@@ -312,8 +307,8 @@ class RealtimeClient with LoggerMixin {
         },
       if (tools != null) 'tools': tools.map((t) => t.toJson()).toList(),
       if (toolChoice != null) 'tool_choice': toolChoice.toJson(),
-      if (temperature != null) 'temperature': temperature,
-      if (maxOutputTokens != null) 'max_output_tokens': maxOutputTokens,
+      'temperature': ?temperature,
+      'max_output_tokens': ?maxOutputTokens,
     };
     return _send({
       'event_id': _nextId(),
@@ -357,18 +352,22 @@ class RealtimeClient with LoggerMixin {
         _events.add(ConnectionConnected(eventId: id, timestamp: ts));
         break;
       case ConnectionState.disconnected:
-        _events.add(ConnectionDisconnected(
-          eventId: id,
-          timestamp: ts,
-          reason: 'transport disconnected',
-        ));
+        _events.add(
+          ConnectionDisconnected(
+            eventId: id,
+            timestamp: ts,
+            reason: 'transport disconnected',
+          ),
+        );
         break;
       case ConnectionState.failed:
-        _events.add(ConnectionFailed(
-          eventId: id,
-          timestamp: ts,
-          error: 'transport failed',
-        ));
+        _events.add(
+          ConnectionFailed(
+            eventId: id,
+            timestamp: ts,
+            error: 'transport failed',
+          ),
+        );
         break;
       case ConnectionState.connecting:
         break;

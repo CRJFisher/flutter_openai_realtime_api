@@ -74,17 +74,17 @@ class RealtimeWebRtcTransport with LoggerMixin implements RealtimeTransport {
 
       final localDesc = await _pc!.getLocalDescription();
       final answer = await _exchangeSdp(localDesc?.sdp ?? offer.sdp ?? '');
-      await _pc!.setRemoteDescription(
-        RTCSessionDescription(answer, 'answer'),
-      );
+      await _pc!.setRemoteDescription(RTCSessionDescription(answer, 'answer'));
 
       // Connection isn't usable until the data channel opens.
-      await _dataChannelOpen!.future.timeout(const Duration(seconds: 10),
-          onTimeout: () {
-        throw TimeoutException(
-          'Realtime data channel did not open within 10 s',
-        );
-      });
+      await _dataChannelOpen!.future.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw TimeoutException(
+            'Realtime data channel did not open within 10 s',
+          );
+        },
+      );
 
       _setState(ConnectionState.connected);
       logInfo('WebRTC connected (callId: $_callId)');
@@ -157,7 +157,8 @@ class RealtimeWebRtcTransport with LoggerMixin implements RealtimeTransport {
 
   Future<void> _createPeerConnection() async {
     _pc = await createPeerConnection({
-      'iceServers': _config.iceServers ??
+      'iceServers':
+          _config.iceServers ??
           [
             {'urls': 'stun:stun.l.google.com:19302'},
           ],
@@ -252,7 +253,9 @@ class RealtimeWebRtcTransport with LoggerMixin implements RealtimeTransport {
     };
     await completer.future.timeout(
       const Duration(milliseconds: 500),
-      onTimeout: () {/* proceed with whatever candidates we have */},
+      onTimeout: () {
+        /* proceed with whatever candidates we have */
+      },
     );
   }
 
@@ -297,9 +300,7 @@ class RealtimeWebRtcTransport with LoggerMixin implements RealtimeTransport {
 
     final completer = _dataChannelOpen;
     if (completer != null && !completer.isCompleted) {
-      completer.completeError(
-        StateError('connection torn down before open'),
-      );
+      completer.completeError(StateError('connection torn down before open'));
     }
     _dataChannelOpen = null;
 

@@ -300,6 +300,9 @@ class RealtimeUsage {
     required this.outputTextTokens,
     required this.outputAudioTokens,
   });
+
+  /// Parse the `usage` object out of a `response.done` payload. Missing
+  /// or non-numeric values default to `0`.
   factory RealtimeUsage.fromJson(Map<String, dynamic> json) {
     int n(Object? v) => v is num ? v.toInt() : 0;
     final input = json['input_token_details'] as Map<String, dynamic>?;
@@ -323,7 +326,8 @@ class ResponseDone extends ResponseEvent {
   /// Full final `response` object from the server (raw JSON).
   final Map<String, dynamic> response;
 
-  /// `null` until the response actually finishes (no usage on cancellation).
+  /// `null` when the response was cancelled or failed before usage was
+  /// reported by the server.
   final RealtimeUsage? usage;
 
   /// One of `completed`, `cancelled`, `failed`, `incomplete`.
@@ -594,8 +598,8 @@ abstract class AudioEvent extends RealtimeEvent {
   const AudioEvent({required super.eventId, required super.timestamp});
 }
 
-/// Server VAD detected end-of-speech but the audio buffer has been silent
-/// long enough that no speech-start ever fired. WebRTC only.
+/// Server VAD's idle timeout fired before any speech-start was detected.
+/// Configured via `turn_detection.idle_timeout_ms` on the session.
 class InputAudioBufferTimeoutTriggered extends AudioEvent {
   /// Offset in ms within the audio buffer where speech was expected to start.
   final int audioStartMs;
@@ -670,6 +674,7 @@ class InputAudioBufferCleared extends AudioEvent {
 /// WebRTC-only. Server has begun delivering output audio frames over the
 /// audio track for [responseId].
 class OutputAudioBufferStarted extends AudioEvent {
+  /// Id of the response whose audio output has begun.
   final String responseId;
   const OutputAudioBufferStarted({
     required super.eventId,
@@ -783,10 +788,7 @@ abstract class ConnectionEvent extends RealtimeEvent {
 
 /// The transport has connected and the session is ready to use.
 class ConnectionConnected extends ConnectionEvent {
-  const ConnectionConnected({
-    required super.eventId,
-    required super.timestamp,
-  });
+  const ConnectionConnected({required super.eventId, required super.timestamp});
 }
 
 /// The transport disconnected cleanly (e.g. via `RealtimeClient.dispose()`).

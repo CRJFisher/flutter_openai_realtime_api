@@ -16,8 +16,10 @@ class EphemeralToken {
 
   const EphemeralToken({required this.value, required this.expiresAt});
 
+  /// `true` once the wall clock has passed [expiresAt].
   bool get isExpired => DateTime.now().isAfter(expiresAt);
 
+  /// Remaining time until [expiresAt]. [Duration.zero] if already expired.
   Duration get timeRemaining {
     final r = expiresAt.difference(DateTime.now());
     return r.isNegative ? Duration.zero : r;
@@ -28,9 +30,7 @@ class EphemeralToken {
     final value = json['value'] as String?;
     final expiresAt = json['expires_at'];
     if (value == null || expiresAt == null) {
-      throw FormatException(
-        'Unexpected client_secrets response: $json',
-      );
+      throw FormatException('Unexpected client_secrets response: $json');
     }
     return EphemeralToken(
       value: value,
@@ -94,17 +94,23 @@ class CachingEphemeralTokenProvider implements EphemeralTokenProvider {
 /// integrations that happen to be written in Dart (e.g. a Dart Shelf or
 /// Cloud Functions backend).
 class OpenAIClientSecretMinter {
+  /// The long-lived OpenAI `sk-…` API key.
   final String apiKey;
+
+  /// Base URL for the OpenAI API. Override for testing or non-default hosts.
   final String baseUrl;
+
   final http.Client _http;
   final bool _ownsHttp;
 
+  /// Construct a minter. If [httpClient] is omitted, an internal client is
+  /// created and closed by [dispose].
   OpenAIClientSecretMinter({
     required this.apiKey,
     this.baseUrl = Protocol.apiBaseUrl,
     http.Client? httpClient,
-  })  : _http = httpClient ?? http.Client(),
-        _ownsHttp = httpClient == null;
+  }) : _http = httpClient ?? http.Client(),
+       _ownsHttp = httpClient == null;
 
   /// Mint a token. [sessionConfig] is forwarded as the `session` field;
   /// [expiresInSeconds] sets `expires_after.seconds` (10–7200, default 600).
@@ -113,7 +119,7 @@ class OpenAIClientSecretMinter {
     int? expiresInSeconds,
   }) async {
     final body = <String, dynamic>{
-      if (sessionConfig != null) 'session': sessionConfig,
+      'session': ?sessionConfig,
       if (expiresInSeconds != null)
         'expires_after': {'anchor': 'created_at', 'seconds': expiresInSeconds},
     };
@@ -138,6 +144,8 @@ class OpenAIClientSecretMinter {
     );
   }
 
+  /// Close the internal HTTP client, if one was created. No-op when an
+  /// external [http.Client] was supplied.
   void dispose() {
     if (_ownsHttp) _http.close();
   }

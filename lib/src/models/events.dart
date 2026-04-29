@@ -375,7 +375,7 @@ class ResponseAudioDelta extends ResponseEvent {
   final int contentIndex;
 
   /// Base64-encoded PCM audio. Only fires on the WebSocket transport;
-  /// WebRTC delivers audio over the [RTCPeerConnection] track instead.
+  /// WebRTC delivers audio over the `RTCPeerConnection` track instead.
   final String delta;
   const ResponseAudioDelta({
     required super.eventId,

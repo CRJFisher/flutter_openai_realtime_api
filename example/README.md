@@ -44,7 +44,7 @@ The AI assistant is programmed to be helpful and conversational:
 
 ```bash
 # Navigate to the example directory
-cd openai_realtime_api/example
+cd flutter_openai_realtime_api/example
 
 # Install dependencies
 flutter pub get

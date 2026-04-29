@@ -1,5 +1,5 @@
 name: openai_realtime_example
-description: Example app for openai_realtime_api.
+description: Example app for flutter_openai_realtime_api.
 version: 1.0.0+1
 publish_to: 'none'
 
@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  openai_realtime_api:
+  flutter_openai_realtime_api:
     path: ../
 
   permission_handler: ^11.0.0

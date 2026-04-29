@@ -2,7 +2,7 @@ import 'package:logging/logging.dart';
 
 /// Internal logger mixin. Not exported.
 mixin LoggerMixin {
-  static final Logger _logger = Logger('openai_realtime_api');
+  static final Logger _logger = Logger('flutter_openai_realtime_api');
 
   void logInfo(String message) => _logger.info(message);
   void logWarning(String message) => _logger.warning(message);

@@ -1,4 +1,4 @@
-# openai_realtime_api
+# flutter_openai_realtime_api
 
 Flutter client for the OpenAI Realtime GA API. Targets `gpt-realtime` over
 WebRTC for low-latency voice conversations and over WebSocket for
@@ -8,7 +8,7 @@ server-side or text-only use.
 
 ```yaml
 dependencies:
-  openai_realtime_api: ^0.3.0
+  flutter_openai_realtime_api: ^0.3.0
 ```
 
 ## Quick start
@@ -17,7 +17,7 @@ A Flutter client connecting via WebRTC needs an ephemeral token from your
 backend (see Backend setup, below). With a token provider in hand:
 
 ```dart
-import 'package:openai_realtime_api/openai_realtime_api.dart';
+import 'package:flutter_openai_realtime_api/flutter_openai_realtime_api.dart';
 
 final client = RealtimeClient.webRtc(RealtimeConfig(
   tokenProvider: myTokenProvider,
@@ -83,7 +83,7 @@ Request body:
 {
   "expires_after": { "anchor": "created_at", "seconds": 120 },
   "session": {
-    "type":  "realtime",
+    "type": "realtime",
     "model": "gpt-realtime"
   }
 }
@@ -93,9 +93,9 @@ Response body:
 
 ```json
 {
-  "value":      "ek_68af296e8e408191a1120ab6383263c2",
+  "value": "ek_68af296e8e408191a1120ab6383263c2",
   "expires_at": 1735776000,
-  "session":    { "id": "sess_…", "...": "fully-resolved server view" }
+  "session": { "id": "sess_…", "...": "fully-resolved server view" }
 }
 ```
 
@@ -111,26 +111,26 @@ backend.
 
 ```ts
 // functions/src/realtimeToken.ts
-import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { defineSecret } from 'firebase-functions/params';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-import { initializeApp, getApps } from 'firebase-admin/app';
-import { logger } from 'firebase-functions/v2';
+import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { defineSecret } from "firebase-functions/params";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { initializeApp, getApps } from "firebase-admin/app";
+import { logger } from "firebase-functions/v2";
 
 if (!getApps().length) initializeApp();
 
 // firebase functions:secrets:set OPENAI_API_KEY
-const OPENAI_API_KEY = defineSecret('OPENAI_API_KEY');
+const OPENAI_API_KEY = defineSecret("OPENAI_API_KEY");
 
 export const realtimeToken = onCall(
   {
-    region: 'us-central1',
+    region: "us-central1",
     secrets: [OPENAI_API_KEY],
     enforceAppCheck: true,
   },
   async (request) => {
     if (!request.auth) {
-      throw new HttpsError('unauthenticated', 'Sign in required.');
+      throw new HttpsError("unauthenticated", "Sign in required.");
     }
     const uid = request.auth.uid;
 
@@ -142,40 +142,37 @@ export const realtimeToken = onCall(
       const snap = await tx.get(ref);
       const last = (snap.data()?.lastMintMs as number | undefined) ?? 0;
       if (now - last < 5_000) {
-        throw new HttpsError('resource-exhausted', 'Slow down.');
+        throw new HttpsError("resource-exhausted", "Slow down.");
       }
       tx.set(ref, { lastMintMs: now, updatedAt: FieldValue.serverTimestamp() });
     });
 
-    const r = await fetch(
-      'https://api.openai.com/v1/realtime/client_secrets',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${OPENAI_API_KEY.value()}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          expires_after: { anchor: 'created_at', seconds: 120 },
-          session: {
-            type: 'realtime',
-            model: 'gpt-realtime',
-            audio: { output: { voice: 'alloy' } },
-          },
-        }),
+    const r = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${OPENAI_API_KEY.value()}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        expires_after: { anchor: "created_at", seconds: 120 },
+        session: {
+          type: "realtime",
+          model: "gpt-realtime",
+          audio: { output: { voice: "alloy" } },
+        },
+      }),
+    });
 
     if (!r.ok) {
-      logger.error('openai_mint_failed', {
+      logger.error("openai_mint_failed", {
         status: r.status,
         body: await r.text(),
       });
-      throw new HttpsError('unavailable', 'Upstream error.');
+      throw new HttpsError("unavailable", "Upstream error.");
     }
 
     const data = (await r.json()) as { value: string; expires_at: number };
-    logger.info('minted', { uid, expiresAt: data.expires_at });
+    logger.info("minted", { uid, expiresAt: data.expires_at });
     return { token: data.value, expiresAt: data.expires_at };
   },
 );
@@ -185,7 +182,7 @@ Calling it from Flutter:
 
 ```dart
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:openai_realtime_api/openai_realtime_api.dart';
+import 'package:flutter_openai_realtime_api/flutter_openai_realtime_api.dart';
 
 class FirebaseTokenProvider implements EphemeralTokenProvider {
   @override
@@ -308,9 +305,9 @@ behind a button tap.
 
 ## Voice and model selection
 
-| Field   | Default          | Choices                                                              |
-| ------- | ---------------- | -------------------------------------------------------------------- |
-| `model` | `gpt-realtime`   | `gpt-realtime`, `gpt-realtime-mini`, `gpt-realtime-2025-08-28`       |
+| Field   | Default          | Choices                                                                                                               |
+| ------- | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `model` | `gpt-realtime`   | `gpt-realtime`, `gpt-realtime-mini`, `gpt-realtime-2025-08-28`                                                        |
 | `voice` | (server default) | `alloy`, `ash`, `ballad`, `coral`, `echo`, `sage`, `shimmer`, `verse`, `marin` (gpt-realtime), `cedar` (gpt-realtime) |
 
 `marin` and `cedar` work only with `gpt-realtime`; the other eight work

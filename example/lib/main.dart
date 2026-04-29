@@ -1,4 +1,4 @@
-// Example app for openai_realtime_api.
+// Example app for flutter_openai_realtime_api.
 //
 // LOCAL DEVELOPMENT ONLY. This example mints ephemeral tokens directly
 // from the device using the long-lived OpenAI key in `.env`. Do not ship
@@ -9,7 +9,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:openai_realtime_api/openai_realtime_api.dart';
+import 'package:flutter_openai_realtime_api/flutter_openai_realtime_api.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<void> main() async {

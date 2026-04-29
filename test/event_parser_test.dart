@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:openai_realtime_api/openai_realtime_api.dart';
-import 'package:openai_realtime_api/src/internal/event_parser.dart';
+import 'package:flutter_openai_realtime_api/flutter_openai_realtime_api.dart';
+import 'package:flutter_openai_realtime_api/src/internal/event_parser.dart';
 
 void main() {
   group('EventParser', () {

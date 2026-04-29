@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:openai_realtime_api/openai_realtime_api.dart';
+import 'package:flutter_openai_realtime_api/flutter_openai_realtime_api.dart';
 
 class _StubProvider implements EphemeralTokenProvider {
   @override

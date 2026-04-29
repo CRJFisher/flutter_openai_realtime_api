@@ -230,7 +230,8 @@ class ContentPart {
   factory ContentPart.inputText(String text) =>
       ContentPart(type: ContentType.inputText, text: text);
   factory ContentPart.inputAudio({required String audio, String? transcript}) =>
-      ContentPart(type: ContentType.inputAudio, audio: audio, transcript: transcript);
+      ContentPart(
+          type: ContentType.inputAudio, audio: audio, transcript: transcript);
   factory ContentPart.inputImage(String imageUrl) =>
       ContentPart(type: ContentType.inputImage, imageUrl: imageUrl);
 

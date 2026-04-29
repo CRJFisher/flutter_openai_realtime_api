@@ -50,8 +50,7 @@ class EventParser {
         return ConversationCreated(
           eventId: eventId,
           timestamp: ts,
-          conversationId:
-              (json['conversation']?['id'] as String?) ?? '',
+          conversationId: (json['conversation']?['id'] as String?) ?? '',
         );
       case Protocol.conversationItemCreated:
         return ConversationItemCreated(
@@ -126,8 +125,7 @@ class EventParser {
           timestamp: ts,
           itemId: (json['item_id'] as String?) ?? '',
           contentIndex: _intOf(json['content_index']) ?? 0,
-          error:
-              (json['error'] as Map<String, dynamic>?) ?? const {},
+          error: (json['error'] as Map<String, dynamic>?) ?? const {},
         );
 
       // ----- Input audio buffer -----
@@ -200,8 +198,7 @@ class EventParser {
           timestamp: ts,
           responseId: (resp['id'] as String?) ?? '',
           response: resp,
-          usage:
-              usageJson != null ? RealtimeUsage.fromJson(usageJson) : null,
+          usage: usageJson != null ? RealtimeUsage.fromJson(usageJson) : null,
           status: resp['status'] as String?,
         );
       case Protocol.responseOutputItemAdded:
@@ -356,8 +353,7 @@ class EventParser {
 
       // ----- Error -----
       case Protocol.error:
-        final err =
-            (json['error'] as Map<String, dynamic>?) ?? const {};
+        final err = (json['error'] as Map<String, dynamic>?) ?? const {};
         return ErrorEvent(
           eventId: eventId,
           timestamp: ts,

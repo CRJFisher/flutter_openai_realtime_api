@@ -67,8 +67,7 @@ void main() {
           return EphemeralToken(
             value: 'ek_$fetches',
             // First fetch: about to expire (within refresh window).
-            expiresAt:
-                DateTime.now().add(const Duration(seconds: 5)),
+            expiresAt: DateTime.now().add(const Duration(seconds: 5)),
           );
         },
       );

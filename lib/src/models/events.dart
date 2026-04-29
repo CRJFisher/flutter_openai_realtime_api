@@ -238,8 +238,10 @@ class RealtimeUsage {
 
 class ResponseDone extends ResponseEvent {
   final Map<String, dynamic> response;
+
   /// `null` until the response actually finishes (no usage on cancellation).
   final RealtimeUsage? usage;
+
   /// One of `completed`, `cancelled`, `failed`, `incomplete`.
   final String? status;
   const ResponseDone({
@@ -371,6 +373,7 @@ class ResponseAudioTranscriptDone extends ResponseEvent {
 class ResponseAudioDelta extends ResponseEvent {
   final String itemId;
   final int contentIndex;
+
   /// Base64-encoded PCM audio. Only fires on the WebSocket transport;
   /// WebRTC delivers audio over the [RTCPeerConnection] track instead.
   final String delta;
@@ -413,6 +416,7 @@ class ResponseFunctionCallArgumentsDelta extends ResponseEvent {
 class ResponseFunctionCallArgumentsDone extends ResponseEvent {
   final String itemId;
   final String callId;
+
   /// JSON-encoded arguments string. Decode with `jsonDecode(arguments)`.
   final String arguments;
   const ResponseFunctionCallArgumentsDone({
@@ -525,6 +529,7 @@ class RateLimit {
   final String name; // 'requests' or 'tokens'
   final int limit;
   final int remaining;
+
   /// Seconds until reset, as reported on the wire.
   final double resetSeconds;
   const RateLimit({
@@ -553,6 +558,7 @@ class ErrorEvent extends RealtimeEvent {
   final String? code;
   final String message;
   final String? param;
+
   /// `event_id` of the client event that triggered this error, if any.
   final String? errorEventId;
   const ErrorEvent({

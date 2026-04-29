@@ -79,8 +79,8 @@ class RealtimeWebRtcTransport with LoggerMixin implements RealtimeTransport {
       );
 
       // Connection isn't usable until the data channel opens.
-      await _dataChannelOpen!.future
-          .timeout(const Duration(seconds: 10), onTimeout: () {
+      await _dataChannelOpen!.future.timeout(const Duration(seconds: 10),
+          onTimeout: () {
         throw TimeoutException(
           'Realtime data channel did not open within 10 s',
         );
@@ -125,8 +125,7 @@ class RealtimeWebRtcTransport with LoggerMixin implements RealtimeTransport {
       try {
         await sender.replaceTrack(null);
       } catch (e) {
-        logError('replaceTrack(null) failed; falling back to enabled=false',
-            e);
+        logError('replaceTrack(null) failed; falling back to enabled=false', e);
         track.enabled = false;
       }
     } else if (enabled && strategy.replaceTrack && sender != null) {
@@ -134,8 +133,7 @@ class RealtimeWebRtcTransport with LoggerMixin implements RealtimeTransport {
       try {
         await sender.replaceTrack(track);
       } catch (e) {
-        logError('replaceTrack(track) failed; falling back to enabled=true',
-            e);
+        logError('replaceTrack(track) failed; falling back to enabled=true', e);
         track.enabled = true;
       }
     } else {
@@ -215,9 +213,7 @@ class RealtimeWebRtcTransport with LoggerMixin implements RealtimeTransport {
 
   void _createDataChannel() {
     final init = RTCDataChannelInit()..ordered = true;
-    _pc!
-        .createDataChannel(Protocol.dataChannelLabel, init)
-        .then((dc) {
+    _pc!.createDataChannel(Protocol.dataChannelLabel, init).then((dc) {
       _dc = dc;
       dc.onDataChannelState = (state) {
         if (state == RTCDataChannelState.RTCDataChannelOpen &&

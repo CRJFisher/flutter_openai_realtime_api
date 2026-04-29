@@ -1,0 +1,11 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "example/**"
+
+linter:
+  rules:
+    cancel_subscriptions: true
+    close_sinks: true

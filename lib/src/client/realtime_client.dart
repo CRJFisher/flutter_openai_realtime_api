@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show ValueListenable, ValueNotifier;
+import 'package:flutter/foundation.dart'
+    show ValueListenable, ValueNotifier, visibleForTesting;
 import 'package:rxdart/rxdart.dart';
 
 import '../auth/ephemeral_token.dart';
@@ -58,6 +59,14 @@ class RealtimeClient with LoggerMixin {
   /// Functions). Not recommended for browser builds.
   factory RealtimeClient.webSocket(RealtimeConfig config) =>
       RealtimeClient._(config, RealtimeWebSocketTransport(config));
+
+  /// Test-only seam for injecting a fake transport.
+  @visibleForTesting
+  factory RealtimeClient.withTransport(
+    RealtimeConfig config,
+    RealtimeTransport transport,
+  ) =>
+      RealtimeClient._(config, transport);
 
   // ---------------------------------------------------------------------------
   // Public state

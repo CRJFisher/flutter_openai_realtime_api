@@ -1,6 +1,6 @@
 name: flutter_openai_realtime_api
 description: Flutter client for the OpenAI Realtime GA API. WebRTC and WebSocket transports for low-latency voice and text conversations.
-version: 0.3.0
+version: 0.0.1
 homepage: https://github.com/crjfisher/flutter_openai_realtime_api
 repository: https://github.com/crjfisher/flutter_openai_realtime_api
 issue_tracker: https://github.com/crjfisher/flutter_openai_realtime_api/issues

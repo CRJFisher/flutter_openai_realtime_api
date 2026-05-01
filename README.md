@@ -8,6 +8,13 @@ Flutter client for the OpenAI Realtime GA API. Targets `gpt-realtime` over
 WebRTC for low-latency voice conversations and over WebSocket for
 server-side or text-only use.
 
+The OpenAI Realtime API exposes two transports: WebSocket (text + base64
+PCM) and WebRTC (voice over a real RTP track, with native echo
+cancellation and the lowest end-to-end latency). Other Dart/Flutter
+clients implement WebSocket only — this package is the only one that
+implements the WebRTC variant, which is what the Realtime API was
+designed for in the voice case.
+
 Full API reference: <https://pub.dev/documentation/flutter_openai_realtime_api/latest/>
 
 ## Install
@@ -20,7 +27,7 @@ Or add manually:
 
 ```yaml
 dependencies:
-  flutter_openai_realtime_api: ^0.3.0
+  flutter_openai_realtime_api: ^0.0.1
 ```
 
 ## Quick start

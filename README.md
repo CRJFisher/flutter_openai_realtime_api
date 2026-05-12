@@ -4,9 +4,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/crjfisher/flutter_openai_realtime_api/actions/workflows/ci.yml/badge.svg)](https://github.com/crjfisher/flutter_openai_realtime_api/actions/workflows/ci.yml)
 
-Flutter client for the OpenAI Realtime GA API. Targets `gpt-realtime` over
-WebRTC for low-latency voice conversations and over WebSocket for
-server-side or text-only use.
+Flutter client for the OpenAI Realtime GA API. Targets `gpt-realtime-2`
+and the rest of the May 2026 `gpt-realtime-*` lineup over WebRTC for
+low-latency voice conversations and over WebSocket for server-side or
+text-only use.
 
 The OpenAI Realtime API exposes two transports: WebSocket (text + base64
 PCM) and WebRTC (voice over a real RTP track, with native echo
@@ -123,7 +124,7 @@ Request body:
   "expires_after": { "anchor": "created_at", "seconds": 120 },
   "session": {
     "type": "realtime",
-    "model": "gpt-realtime"
+    "model": "gpt-realtime-2"
   }
 }
 ```
@@ -196,7 +197,7 @@ export const realtimeToken = onCall(
         expires_after: { anchor: "created_at", seconds: 120 },
         session: {
           type: "realtime",
-          model: "gpt-realtime",
+          model: "gpt-realtime-2",
           audio: { output: { voice: "alloy" } },
         },
       }),
@@ -367,7 +368,7 @@ as a working reference if you'd rather not edit the plists by hand.
 
 | Field   | Default          | Choices                                                                                                               |
 | ------- | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `model` | `gpt-realtime`   | See the model table below.                                                                                            |
+| `model` | `gpt-realtime-2` | See the model table below.                                                                                            |
 | `voice` | (server default) | `alloy`, `ash`, `ballad`, `coral`, `echo`, `sage`, `shimmer`, `verse`, `marin` (gpt-realtime), `cedar` (gpt-realtime) |
 
 `marin` and `cedar` work only with `gpt-realtime`; the other eight work
@@ -377,8 +378,8 @@ with every current model.
 
 | Model ID                       | Notes                                                                                                                                  |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `gpt-realtime`                 | Rolling alias for the current GA speech-to-speech model. Safe default.                                                                 |
-| `gpt-realtime-2`               | Reasoning S2S model (released 2026-05-07). 128k context, configurable reasoning effort. Higher-quality answers at the cost of latency. |
+| `gpt-realtime-2`               | **Default.** Reasoning S2S model (released 2026-05-07). 128k context, configurable reasoning effort.                                   |
+| `gpt-realtime`                 | Rolling alias for the previous GA speech-to-speech model.                                                                              |
 | `gpt-realtime-1.5`             | Non-reasoning S2S model tuned for the lowest latency (released 2026-02-24).                                                            |
 | `gpt-realtime-mini`            | Rolling alias for the smaller/cheaper mini variant.                                                                                    |
 | `gpt-realtime-mini-2025-12-15` | Dated `mini` snapshot.                                                                                                                 |

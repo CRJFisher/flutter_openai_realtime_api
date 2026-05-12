@@ -72,7 +72,7 @@ class _DemoPageState extends State<_DemoPage> {
       fetcher: () => minter.mint(
         sessionConfig: {
           'type': 'realtime',
-          'model': RealtimeModel.gptRealtime.id,
+          'model': RealtimeModel.gptRealtime2.id,
         },
         expiresInSeconds: 120,
       ),

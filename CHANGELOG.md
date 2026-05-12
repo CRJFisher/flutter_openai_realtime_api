@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.2] - 2026-05-12
+
+- **Breaking-ish default change:** `RealtimeConfig.model` now defaults to
+  `RealtimeModel.gptRealtime2` (`gpt-realtime-2`) instead of the
+  `gpt-realtime` rolling alias. New sessions created without an explicit
+  `model` will use the May 2026 reasoning model. Pin the previous
+  behaviour with `model: RealtimeModel.gptRealtime`.
+- README and example app updated to reference `gpt-realtime-2`.
+
 ## [0.1.1] - 2026-05-12
 
 - Added the May 2026 Realtime API model lineup to `RealtimeModel`:

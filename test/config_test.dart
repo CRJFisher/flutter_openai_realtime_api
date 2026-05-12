@@ -23,7 +23,7 @@ void main() {
       );
       final json = config.toSessionJson();
       expect(json['type'], 'realtime');
-      expect(json['model'], 'gpt-realtime');
+      expect(json['model'], 'gpt-realtime-2');
       expect(json['output_modalities'], ['text', 'audio']);
       expect(json['instructions'], 'be helpful');
 

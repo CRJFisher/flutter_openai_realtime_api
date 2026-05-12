@@ -63,7 +63,7 @@ class RealtimeConfig {
     this.tokenProvider,
     this.baseUrl,
     this.iceServers,
-    this.model = RealtimeModel.gptRealtime,
+    this.model = RealtimeModel.gptRealtime2,
     this.outputModalities = const [Modality.text, Modality.audio],
     this.voice,
     this.instructions,

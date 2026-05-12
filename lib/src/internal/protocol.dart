@@ -115,15 +115,13 @@ class Protocol {
 /// Listed values are valid as of May 2026. The legacy `gpt-4o-realtime-*`
 /// previews shut down 2026-05-07; they are not represented here.
 enum RealtimeModel {
-  /// Rolling alias for the current GA speech-to-speech model. Currently the
-  /// safest default; points to a recent `gpt-realtime-*` snapshot on the
-  /// server side.
+  /// Rolling alias for the GA speech-to-speech model. Points to a recent
+  /// `gpt-realtime-*` snapshot on the server side.
   gptRealtime('gpt-realtime'),
 
   /// Reasoning speech-to-speech model with GPT-5-class capabilities
   /// (released 2026-05-07). 128k context, configurable reasoning effort.
-  /// Choose this when you want higher-quality answers and can tolerate the
-  /// extra latency that reasoning adds.
+  /// This is the default for [RealtimeConfig.model].
   gptRealtime2('gpt-realtime-2'),
 
   /// Non-reasoning speech-to-speech model tuned for the lowest latency

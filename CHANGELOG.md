@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.1] - 2026-05-12
+
+- Added the May 2026 Realtime API model lineup to `RealtimeModel`:
+  `gpt-realtime-2` (reasoning S2S), `gpt-realtime-1.5` (low-latency S2S),
+  `gpt-realtime-mini-2025-12-15`, `gpt-realtime-mini-2025-10-06`,
+  `gpt-realtime-translate` (live S2S translation), and
+  `gpt-realtime-whisper` (streaming STT). README and the
+  `RealtimeModel` enum test were updated to match.
+
 ## [0.0.1] - 2026-04-30
 
 Initial public release. Targets the OpenAI Realtime GA API.

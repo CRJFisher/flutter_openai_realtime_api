@@ -148,12 +148,16 @@ void main() {
 
   group('RealtimeModel enum', () {
     test('contains only current GA models', () {
-      // Reviewer 5 caught: deprecated `gpt-4o-realtime-preview-*` were
-      // included in the prior enum.
       expect(RealtimeModel.values.map((m) => m.id).toSet(), {
         'gpt-realtime',
+        'gpt-realtime-2',
+        'gpt-realtime-1.5',
         'gpt-realtime-mini',
+        'gpt-realtime-mini-2025-12-15',
+        'gpt-realtime-mini-2025-10-06',
         'gpt-realtime-2025-08-28',
+        'gpt-realtime-translate',
+        'gpt-realtime-whisper',
       });
     });
   });

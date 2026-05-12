@@ -112,17 +112,46 @@ class Protocol {
 
 /// Models supported by the Realtime API.
 ///
-/// Listed values are valid as of late 2025. The constants `gpt-4o-realtime-*`
-/// shut down 2026-05-07; do not use them for new sessions.
+/// Listed values are valid as of May 2026. The legacy `gpt-4o-realtime-*`
+/// previews shut down 2026-05-07; they are not represented here.
 enum RealtimeModel {
-  /// Latest production model. Use this unless you have a reason not to.
+  /// Rolling alias for the current GA speech-to-speech model. Currently the
+  /// safest default; points to a recent `gpt-realtime-*` snapshot on the
+  /// server side.
   gptRealtime('gpt-realtime'),
 
-  /// Smaller/cheaper variant of `gpt-realtime`.
+  /// Reasoning speech-to-speech model with GPT-5-class capabilities
+  /// (released 2026-05-07). 128k context, configurable reasoning effort.
+  /// Choose this when you want higher-quality answers and can tolerate the
+  /// extra latency that reasoning adds.
+  gptRealtime2('gpt-realtime-2'),
+
+  /// Non-reasoning speech-to-speech model tuned for the lowest latency
+  /// (released 2026-02-24). Use this when responsiveness matters more than
+  /// reasoning depth.
+  gptRealtime15('gpt-realtime-1.5'),
+
+  /// Rolling alias for the smaller/cheaper variant of `gpt-realtime`.
   gptRealtimeMini('gpt-realtime-mini'),
 
+  /// Dated snapshot of `gpt-realtime-mini` (2025-12-15).
+  gptRealtimeMini20251215('gpt-realtime-mini-2025-12-15'),
+
+  /// Dated snapshot of `gpt-realtime-mini` (2025-10-06).
+  gptRealtimeMini20251006('gpt-realtime-mini-2025-10-06'),
+
   /// Dated snapshot of `gpt-realtime` (2025-08-28).
-  gptRealtime20250828('gpt-realtime-2025-08-28');
+  gptRealtime20250828('gpt-realtime-2025-08-28'),
+
+  /// Streaming speech-to-speech translation across 70+ input languages
+  /// and 13 output languages (released 2026-05-07). Specialised model:
+  /// pair this with the same Realtime transports, but expect translation
+  /// behaviour rather than open-ended conversation.
+  gptRealtimeTranslate('gpt-realtime-translate'),
+
+  /// Streaming low-latency speech-to-text (released 2026-05-07).
+  /// Specialised model: returns transcripts, not synthesised audio.
+  gptRealtimeWhisper('gpt-realtime-whisper');
 
   const RealtimeModel(this.id);
   final String id;

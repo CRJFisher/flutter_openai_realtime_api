@@ -367,11 +367,28 @@ as a working reference if you'd rather not edit the plists by hand.
 
 | Field   | Default          | Choices                                                                                                               |
 | ------- | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `model` | `gpt-realtime`   | `gpt-realtime`, `gpt-realtime-mini`, `gpt-realtime-2025-08-28`                                                        |
+| `model` | `gpt-realtime`   | See the model table below.                                                                                            |
 | `voice` | (server default) | `alloy`, `ash`, `ballad`, `coral`, `echo`, `sage`, `shimmer`, `verse`, `marin` (gpt-realtime), `cedar` (gpt-realtime) |
 
 `marin` and `cedar` work only with `gpt-realtime`; the other eight work
 with every current model.
+
+### Realtime models
+
+| Model ID                       | Notes                                                                                                                                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `gpt-realtime`                 | Rolling alias for the current GA speech-to-speech model. Safe default.                                                                 |
+| `gpt-realtime-2`               | Reasoning S2S model (released 2026-05-07). 128k context, configurable reasoning effort. Higher-quality answers at the cost of latency. |
+| `gpt-realtime-1.5`             | Non-reasoning S2S model tuned for the lowest latency (released 2026-02-24).                                                            |
+| `gpt-realtime-mini`            | Rolling alias for the smaller/cheaper mini variant.                                                                                    |
+| `gpt-realtime-mini-2025-12-15` | Dated `mini` snapshot.                                                                                                                 |
+| `gpt-realtime-mini-2025-10-06` | Dated `mini` snapshot.                                                                                                                 |
+| `gpt-realtime-2025-08-28`      | Dated snapshot of the base `gpt-realtime`.                                                                                             |
+| `gpt-realtime-translate`       | Specialised model for live speech-to-speech translation (70+ in / 13 out languages, released 2026-05-07).                              |
+| `gpt-realtime-whisper`         | Specialised low-latency streaming speech-to-text (released 2026-05-07). Returns transcripts, not synthesised audio.                    |
+
+The legacy `gpt-4o-realtime-preview-*` previews shut down on
+2026-05-07 and are not supported.
 
 ## Echo cancellation on Android
 
